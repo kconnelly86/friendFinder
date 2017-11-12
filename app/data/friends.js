@@ -1,4 +1,4 @@
-  	// Chosen CSS
+// Chosen CSS
     var config = {
       '.chosen-select'           : {},
       '.chosen-select-deselect'  : {allow_single_deselect:true},
@@ -6,6 +6,9 @@
       '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
       '.chosen-select-width'     : {width:"95%"}
     }
+
+
+    
     for (var selector in config) {
       $(selector).chosen(config[selector]);
     }
@@ -13,52 +16,80 @@
     // Capture the form inputs 
     $("#submit").on("click", function(){
 
-    	// Form validation
-    	function validateForm() {
-		  var isValid = true;
-		  $('.form-control').each(function() {
-		    if ( $(this).val() === '' )
-		        isValid = false;
-		  });
+      // Form validation
+      function validateForm() {
+      var isValid = true;
+      $('.form-control').each(function() {
+        if ( $(this).val() === '' )
+            isValid = false;
+      });
 
-		  $('.chosen-select').each(function() {
+      $('.chosen-select').each(function() {
 
-		  	if( $(this).val() === "")
-		  		isValid = false
-		  })
-		  return isValid;
-		}
+        if( $(this).val() === "")
+          isValid = false
+      })
+      return isValid;
+    }
 
-		// If all required fields are filled
-		if (validateForm() == true)
-		{
-			// Create an object for the user's data
-	    	var userData = {
-	    		name: $("#name").val(),
-	    		photo: $("#photo").val(),
-	    		scores: [$("#q1").val(), $("#q2").val(), $("#q3").val(), $("#q4").val(), $("#q5").val(), $("#q6").val(), $("#q7").val(), $("#q8").val(), $("#q9").val(), $("#q10").val(), ]
-	    	}
+    // If all required fields are filled
+    if (validateForm() == true)
+    {
+      // Create an object for the user's data
+        var userData = {
+          name: $("#name").val(),
+          photo: $("#photo").val(),
+          scores: [$("#q1").val(), $("#q2").val(), $("#q3").val(), $("#q4").val(), $("#q5").val(), $("#q6").val(), $("#q7").val(), $("#q8").val(), $("#q9").val(), $("#q10").val(), ],
+
+        }
+
+         var scoreArray = userData.scores;
+         console.log(scoreArray);
+         var totalScore = 0;
+         var userGrade ="";
+         for (var i = 0; i < scoreArray.length; i++) {
+           totalScore += parseInt(scoreArray[i]);
+         }
+         if(totalScore >= 10 && totalScore <=20) {
+            userGrade = "a"
+            userData["userGrade"] = userGrade;
+         } else if (totalScore >= 21 && totalScore <= 30) {
+            userGrade = "b";
+            userData["userGrade"] = userGrade;
+         } else if (totalScore >= 31 && totalScore <= 40) {
+            userGrade = "c";
+            userData["userGrade"] = userGrade;
+         }else  {
+            userGrade = "d";
+            userData["userGrade"] = userGrade;
+         };
+         
+         console.log(userData);
+         
 
 
-	    	// Grab the URL of the website
-	    	var currentURL = window.location.origin;
 
-	    	// AJAX post the data to the friends API. 
-	    	$.post(currentURL + "/api/friends", userData, function(data){
+        // AJAX post the data to the friends API.
 
-	    		// Grab the result from the AJAX post so that the best match's name and photo are displayed.
-	    		$("#matchName").text(data.name);
-	    		$('#matchImg').attr("src", data.photo);
+          // Grab the URL of the website
+        var currentURL = window.location.origin;
 
-		    	// Show the modal with the best match 
-		    	$("#resultsModal").modal('toggle');
+        // AJAX post the data to the friends API. 
+        $.post(currentURL + "/api/friends", userData, function(data){
+         for (var i = 0; i < data.length; i++) {
+           $("#modal-body").append("<h2>"+data[i].name+"</h2>");
+           $("#modal-body").append("<img src="+data[i].photo+"></img>");
+         };
+         // Show the modal with the best match
+         $("#resultsModal").modal('toggle');
+       });
 
-	    	});
-		}
-		else
-		{
-			alert("Please fill out all fields before submitting!");
-		}
-    	
-    	return false;
+        
+    }
+    else
+    {
+      alert("Please fill out all fields before submitting!");
+    }
+      
+      return false;
     });
